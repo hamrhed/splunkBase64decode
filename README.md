@@ -10,8 +10,7 @@
 2. Returned is the variable _ascii_  -- this contains the ascii value of the string, returned by the macro
 
 ## Example:  Identify ASCII behind base64 sender name, typically used to identify email impersonations
-
-  ```index=_YourIndex_ event_type=_EmailEventType_
+ index=_YourIndex_ event_type=_EmailEventType_
       "smtp.rcpt_to{}"="*@_YourDomain_"
       "email.from"="=?UTF-8?B?*"
       | rex field=email.from "=?UTF-8\?B\?(?<senderName>[\w\=+\/]*)\?=.*<(?<the_rest>.*)>"
@@ -20,6 +19,6 @@
       | eval reason="VIP Impersonation (base64)"
       | eval ascii=lower(ascii)
       | eval from="(". ascii. ") ". the_rest
-      ```
+ 
 
 
