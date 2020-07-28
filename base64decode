@@ -1,0 +1,20 @@
+appendpipe 
+[ 
+  | dedup $arg1$
+  | eval converts=split($arg1$,"")
+  | mvexpand (converts)
+  | lookup base64conversion.csv index as converts OUTPUT value as base64bin
+  | stats list(base64bin) as base64bin by $arg1$
+  | nomv base64bin
+  | rex field=base64bin mode=sed "s/\ //g"
+  | rex field=base64bin "(?<asciibin>.{8})" max_match=100
+  | mvexpand asciibin
+  | lookup base64conversion.csv index as asciibin OUTPUT value as ascii
+  | stats list(ascii) as ascii by $arg1$
+  | nomv ascii
+  | rex field=ascii mode=sed "s/\ \ /_/g"
+  | rex field=ascii mode=sed "s/\ //g"
+  | rex field=ascii mode=sed "s/_/ /g"
+  | table $arg1$ ascii
+]
+|selfjoin $arg1$
